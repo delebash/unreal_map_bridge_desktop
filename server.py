@@ -18,7 +18,7 @@ def subscribe():
 
 @app.route('/', methods=['GET', 'OPTIONS'])
 def running():
-    return 'Server is running'
+    return {'msg': 'server is running'}
 
 
 @app.route('/process_tiles', methods=['GET', 'POST', 'OPTIONS'])
@@ -36,7 +36,7 @@ def process_tiles():  # put application's code here
         print('done stitching')
         return {'msg': 'done'}
     else:
-        return jsonify({'error': 'not json'})
+        return jsonify({'msg': 'not json'})
 
 
 if __name__ == '__main__':
