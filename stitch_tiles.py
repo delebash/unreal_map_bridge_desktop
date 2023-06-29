@@ -82,7 +82,9 @@ def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, pu
     # # Save the final image
     msg = {"event": "stitch_tiles", "process": "saving_file"}
     publisher.publish(json.dumps(msg))
+    images_array.clear()
     composite.save(base_dir + '/' + sub_dir + '/' + filename)
+    composite.close()
 
 # # Testing uncomment
 # bbox = [-122.33875557099599, 46.23192217548484, -121.69074845551023, 45.78185052337425]

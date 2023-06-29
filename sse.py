@@ -3,6 +3,7 @@ from collections import defaultdict, namedtuple
 
 Subscriber = namedtuple('Subscriber', 'queue, properties')
 
+
 class Publisher(object):
     """
     Contains a list of subscribers that can can receive updates.
@@ -112,7 +113,8 @@ class Publisher(object):
             if properties is None:
                 subscribers_list[:] = []
             else:
-                subscribers_list[:] = [subscriber for subscriber in subscribers_list if subscriber.properties != properties]
+                subscribers_list[:] = [subscriber for subscriber in subscribers_list if
+                                       subscriber.properties != properties]
 
     def _make_generator(self, queue):
         """
@@ -125,7 +127,6 @@ class Publisher(object):
                 return
             yield data
 
-
     def close(self):
         """
         Closes all active subscriptions.
@@ -135,41 +136,40 @@ class Publisher(object):
                 queue.put(Publisher.END_STREAM)
             channel.clear()
 
-
-if __name__ == '__main__':
-    # Starts an example chat application.
-    # Run this module and point your browser to http://localhost:5000
-
-    import cgi
-    import flask
-    publisher = Publisher()
-
-    app = flask.Flask(__name__, static_folder='static', static_url_path='')
-
-    @app.route('/publish', methods=['POST'])
-    def publish():
-        sender_username = flask.request.form['username']
-        chat_message = flask.request.form['message']
-
-        template = '<strong>{}</strong>: {}'
-        full_message = template.format(cgi.escape(sender_username),
-                                       cgi.escape(chat_message))
-
-        def m(subscriber_username):
-            if subscriber_username != sender_username:
-                return full_message
-        publisher.publish(m)
-
-        return ''
-
-    @app.route('/subscribe')
-    def subscribe():
-        username = flask.request.args.get('username')
-        return flask.Response(publisher.subscribe(properties=username),
-                              content_type='text/event-stream')
-
-    @app.route('/')
-    def root():
-        return app.send_static_file('chat.html')
-
-    app.run(debug=True, threaded=True)
+# if __name__ == '__main__':
+#     # Starts an example chat application.
+#     # Run this module and point your browser to http://localhost:5000
+#
+#     import cgi
+#     import flask
+#     publisher = Publisher()
+#
+#     app = flask.Flask(__name__, static_folder='static', static_url_path='')
+#
+#     @app.route('/publish', methods=['POST'])
+#     def publish():
+#         sender_username = flask.request.form['username']
+#         chat_message = flask.request.form['message']
+#
+#         template = '<strong>{}</strong>: {}'
+#         full_message = template.format(cgi.escape(sender_username),
+#                                        cgi.escape(chat_message))
+#
+#         def m(subscriber_username):
+#             if subscriber_username != sender_username:
+#                 return full_message
+#         publisher.publish(m)
+#
+#         return ''
+#
+#     @app.route('/subscribe')
+#     def subscribe():
+#         username = flask.request.args.get('username')
+#         return flask.Response(publisher.subscribe(properties=username),
+#                               content_type='text/event-stream')
+#
+#     @app.route('/')
+#     def root():
+#         return app.send_static_file('chat.html')
+#
+#     app.run(debug=True, threaded=True)
