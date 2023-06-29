@@ -12,18 +12,11 @@ session = CachedSession()
 session.settings.expire_after = NEVER_EXPIRE
 
 
-def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, composite_dir, publisher):
-    # access_token = 'pk.eyJ1IjoiZGVsZWJhc2giLCJhIjoiY2t1YWxkODF0MGh2NjJxcXA4czBpdXlmdyJ9.D_ngzR7j4vU1CILtpNLg4Q'
-    # terrain_url = 'https://api.mapbox.com/v4/mapbox.terrain-rgb/'
-    # api_url = 'https://api.mapbox.com/v4/mapbox.satellite/'
-    # elevation_dir = 'elevation_images/'
-    # satellite_dir = 'satellite_images/'
-    # composite_dir = 'satellite_composite_images/'
-    # base_dir = 'F:/3DProjects/github/DansProjects/map_bridge_backend_flask/'
-    # os.makedirs(os.path.dirname(base_dir + satellite_dir), exist_ok=True)
-    # os.makedirs(os.path.dirname(base_dir + elevation_dir), exist_ok=True)
-    os.makedirs(os.path.dirname(base_dir + composite_dir), exist_ok=True)
+def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, publisher):
+    # os.makedirs(os.path.dirname(base_dir), exist_ok=True)
 
+    print(base_dir)
+    print(sub_dir)
     top_left_lng = bbox[0]
     top_left_lat = bbox[1]
     bottom_right_lng = bbox[2]
@@ -92,7 +85,7 @@ def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, composite_d
     # # Save the final image
     msg = {"event": "stitch_tiles", "process": "saving_file"}
     publisher.publish(json.dumps(msg))
-    composite.save(base_dir + composite_dir + filename)
+    composite.save(base_dir + '/' + sub_dir + '/' + filename)
 
 # # Testing uncomment
 # bbox = [-122.33875557099599, 46.23192217548484, -121.69074845551023, 45.78185052337425]

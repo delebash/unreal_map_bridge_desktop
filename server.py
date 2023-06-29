@@ -26,13 +26,13 @@ def process_tiles():  # put application's code here
     if request.is_json:
         request_data = request.get_json()
         bbox = request_data['bbox']
-        zoom = request_data['zoom']
         filename = request_data['filename']
+        zoom = request_data['zoom']
         access_token = request_data['access_token']
         api_url = request_data['api_url']
         base_dir = request_data['base_dir']
-        composite_dir = request_data['composite_dir']
-        stitch_tiles(bbox, zoom, filename, access_token, api_url, base_dir, composite_dir, publisher)
+        sub_dir = request_data['sub_dir']
+        stitch_tiles(bbox, zoom, filename, access_token, api_url, base_dir, sub_dir, publisher)
         print('done stitching')
         return {'msg': 'done'}
     else:
