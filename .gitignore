@@ -1,3 +1,4 @@
 /venv/
 /satellite_composite_images/
 /http_cache.sqlite
+/map_bridge_backend_server/
