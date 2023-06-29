@@ -27,11 +27,7 @@
   },
   {
    "optionDest": "clean_build",
-   "value": false
-  },
-  {
-   "optionDest": "splash",
-   "value": "F:/3DProjects/github/DansProjects/map_bridge_backend_flask/icon.png"
+   "value": true
   },
   {
    "optionDest": "strip",
