@@ -15,8 +15,6 @@ session.settings.expire_after = NEVER_EXPIRE
 def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, publisher):
     # os.makedirs(os.path.dirname(base_dir), exist_ok=True)
 
-    print(base_dir)
-    print(sub_dir)
     top_left_lng = bbox[0]
     top_left_lat = bbox[1]
     bottom_right_lng = bbox[2]
