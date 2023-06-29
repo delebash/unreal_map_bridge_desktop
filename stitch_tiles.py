@@ -20,7 +20,6 @@ def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, pu
     bottom_right_lng = bbox[2]
     bottom_right_lat = bbox[3]
 
-    print(top_left_lat)
     tl = [top_left_lat, top_left_lng]
     br = [bottom_right_lat, bottom_right_lng]
 
@@ -34,7 +33,7 @@ def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, pu
     # Loop over the tile ranges
     for i, x in enumerate(range(x_tile_range[0], x_tile_range[1] + 1)):
         for j, y in enumerate(range(y_tile_range[0], y_tile_range[1] + 1)):
-            url = api_url + str(z) + '/' + str(x) + '/' + str(y) + '@2x.pngraw?access_token=' + access_token
+            url = api_url + str(z) + '/' + str(x) + '/' + str(y) + access_token
             key = str(i) + '.' + str(j)
             urls_array[key] = url
     sorted_urls = dict(sorted(urls_array.items()))
