@@ -18,10 +18,6 @@
    "value": true
   },
   {
-   "optionDest": "icon_file",
-   "value": "F:/3DProjects/github/DansProjects/map_bridge_backend_flask/favicon.ico"
-  },
-  {
    "optionDest": "name",
    "value": "Unreal Map Bridge Backend Server"
   },
