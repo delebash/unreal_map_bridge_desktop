@@ -7,14 +7,19 @@ import PIL
 from requests_cache import NEVER_EXPIRE, CachedSession
 import json
 from io import BytesIO
+from osgeo import gdal
 
+# BASE_DIR = os.curdir
+# os.environ['PATH'] = os.path.join(BASE_DIR, r'venv\Lib\site-packages\osgeo') + ';' + os.environ['PATH']
+# os.environ['PROJ_LIB'] = os.path.join(BASE_DIR, r'env3\Lib\site-packages\osgeo\data\proj') + ';' + os.environ['PATH']
+# GDAL_LIBRARY_PATH = os.path.join(BASE_DIR, r'venv\lib\site-packages\osgeo\gdal300.dll')
 session = CachedSession()
 session.settings.expire_after = NEVER_EXPIRE
 
 
 def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, publisher):
     # os.makedirs(os.path.dirname(base_dir), exist_ok=True)
-
+    save_path = base_dir + '/' + sub_dir + '/' + filename
     top_left_lng = bbox[0]
     top_left_lat = bbox[1]
     bottom_right_lng = bbox[2]
@@ -83,7 +88,7 @@ def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, pu
     msg = {"event": "stitch_tiles", "process": "saving_file"}
     publisher.publish(json.dumps(msg))
     images_array.clear()
-    composite.save(base_dir + '/' + sub_dir + '/' + filename)
+    composite.save(save_path)
     composite.close()
 
 # # Testing uncomment

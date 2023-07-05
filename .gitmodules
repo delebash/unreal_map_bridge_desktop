@@ -1,0 +1,3 @@
+[submodule "unreal_map_bridge"]
+	path = unreal_map_bridge
+	url = https://github.com/delebash/unreal_map_bridge.git
