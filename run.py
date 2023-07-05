@@ -1,30 +1,42 @@
 # run.py
-from waitress import serve
-from app import app  # Import your app
-# import easygui
-# import os, sys
+
+import webview
+import waitress
+from app import app
+import pyautogui
+import os, time, signal
 
 port = 5000
 host = '127.0.0.1'
-# Run from the same directory as this script
-# this_files_dir = os.path.dirname(os.path.abspath(__file__))
-# os.chdir(this_files_dir)
 
-serve(app, host=host, port=port)
+width, height = pyautogui.size()
+server = waitress.create_server(app, host=host, port=port)
 
 
-# def exit_program():
-#     print("Exiting the program...")
-#     sys.exit(0)
-#
-#
-# msg = "Server Running..."
-# title = "Unreal Map Bridge Server"
-# choices = ["Quit"]
-# reply = easygui.buttonbox(msg, title, choices=choices)
-# if reply == "Quit":
-#     exit_program()
-# elif reply == "Stop Server":
-#     os.startfile("C:\\Users\\lespo\\AppData\\Local\\slack\\slack.exe")
-# else:
-#     print("Done")
+def on_closed():
+    shutdown_server()
+    print('Unreal Map Bridge is closing')
+
+
+# @route('/stop')
+# def handle_stop_request():
+#     # Handle "stop server" request from client: start a new thread to stop the server
+#     Thread(target=shutdown_server).start()
+#     return ''
+
+
+def shutdown_server():
+    # time.sleep(2)
+    pid = os.getpid()  # Get process ID of the current Python script
+    os.kill(pid, signal.SIGINT)
+    # Kill the current script process with SIGINT, which does same as "Ctrl-C"
+
+
+def custom_logic(window):
+    print('Start')
+    server.run()
+
+
+window = webview.create_window('Unreal Map Bridge', url='https://map.justgeektechs.com', height=height, width=width)
+window.events.closed += on_closed
+webview.start(custom_logic, window)
