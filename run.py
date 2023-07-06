@@ -1,35 +1,33 @@
 # run.py
-
 import webview
 import waitress
 from app import app
 import pyautogui
-import os, time, signal
+import os
+import sys
+import signal
 
+debug = False
 port = 5000
 host = '127.0.0.1'
+args = sys.argv
+if len(args) > 1:
+    if args[1] == '--debug':
+        debug = True
 
 width, height = pyautogui.size()
 server = waitress.create_server(app, host=host, port=port)
 
 
 def on_closed():
-    shutdown_server()
     print('Unreal Map Bridge is closing')
-
-
-# @route('/stop')
-# def handle_stop_request():
-#     # Handle "stop server" request from client: start a new thread to stop the server
-#     Thread(target=shutdown_server).start()
-#     return ''
+    shutdown_server()
 
 
 def shutdown_server():
-    # time.sleep(2)
+    print('Stop')
     pid = os.getpid()  # Get process ID of the current Python script
     os.kill(pid, signal.SIGINT)
-    # Kill the current script process with SIGINT, which does same as "Ctrl-C"
 
 
 def custom_logic(window):
@@ -39,4 +37,28 @@ def custom_logic(window):
 
 window = webview.create_window('Unreal Map Bridge', url='https://map.justgeektechs.com', height=height, width=width)
 window.events.closed += on_closed
-webview.start(custom_logic, window)
+webview.start(func=custom_logic, args=window, debug=debug, private_mode=False)
+
+# @route('/stop')
+# def handle_stop_request():
+#     # Handle "stop server" request from client: start a new thread to stop the server
+#     Thread(target=shutdown_server).start()
+#     return ''
+
+# def callback(result):
+#     print(result)
+
+
+# def on_shown():
+#     print(window)
+
+
+# def close_dev_window():
+# result = window.evaluate_js(
+#     r"""
+#     // Return user agent
+#     'User agent:\n' + browser;
+#     """
+# )
+#
+# print(result)
