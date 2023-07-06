@@ -4,19 +4,22 @@ import waitress
 from app import app
 import pyautogui
 import os
-import sys
 import signal
+import argparse
 
-debug = False
-port = 5000
-host = '127.0.0.1'
-args = sys.argv
-if len(args) > 1:
-    if args[1] == '--debug':
-        debug = True
+parser = argparse.ArgumentParser("commandline_args")
+parser.add_argument("--debug", help="Enables web browser debug tools defaults to false", dest='debug', type=bool, default=False)
+parser.add_argument("--host", help="Host string defaults to 127.0.0.1", dest='host', type=str, default='127.0.0.1')
+parser.add_argument("--port", help="Port defaults to 5000", dest='port', type=int, default=5000)
+
+args = parser.parse_args()
+
+# debug = args.debug or False
+# port = args.port or 5000
+# host = args.host or '127.0.0.1'
 
 width, height = pyautogui.size()
-server = waitress.create_server(app, host=host, port=port)
+server = waitress.create_server(app, host=args.host, port=args.port)
 
 
 def on_closed():
@@ -37,7 +40,7 @@ def custom_logic(window):
 
 window = webview.create_window('Unreal Map Bridge', url='https://map.justgeektechs.com', height=height, width=width)
 window.events.closed += on_closed
-webview.start(func=custom_logic, args=window, debug=debug, private_mode=False)
+webview.start(func=custom_logic, args=window, debug=args.debug, private_mode=False)
 
 # @route('/stop')
 # def handle_stop_request():
