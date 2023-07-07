@@ -8,7 +8,8 @@ import signal
 import argparse
 
 parser = argparse.ArgumentParser("commandline_args")
-parser.add_argument("--debug", help="Enables web browser debug tools defaults to false", dest='debug', type=bool, default=False)
+parser.add_argument("--debug", help="Enables web browser debug tools defaults to false", dest='debug', type=bool,
+                    default=False)
 parser.add_argument("--host", help="Host string defaults to 127.0.0.1", dest='host', type=str, default='127.0.0.1')
 parser.add_argument("--port", help="Port defaults to 5000", dest='port', type=int, default=5000)
 
