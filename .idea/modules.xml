@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/map_bridge_desktop.iml" filepath="$PROJECT_DIR$/.idea/map_bridge_desktop.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/unreal_map_bridge_desktop.iml" filepath="$PROJECT_DIR$/.idea/unreal_map_bridge_desktop.iml" />
     </modules>
   </component>
 </project>
