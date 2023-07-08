@@ -1,6 +1,6 @@
 # Import the image, math and os libraries
-import os
-import requests  # The requests package allows use to call URLS
+# import os
+# import requests  # The requests package allows use to call URLS
 import mercantile
 from PIL import Image, ImageFilter
 from requests_cache import NEVER_EXPIRE, CachedSession
