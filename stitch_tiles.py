@@ -1,13 +1,15 @@
 # Import the image, math and os libraries
 import os
 import requests  # The requests package allows use to call URLS
-from PIL import Image
 import mercantile
-import PIL
+from PIL import Image, ImageFilter
 from requests_cache import NEVER_EXPIRE, CachedSession
 import json
 from io import BytesIO
 from osgeo import gdal
+from osgeo import gdal_array
+import numpy as np
+from scipy.ndimage.filters import gaussian_filter
 
 # BASE_DIR = os.curdir
 # os.environ['PATH'] = os.path.join(BASE_DIR, r'venv\Lib\site-packages\osgeo') + ';' + os.environ['PATH']
@@ -17,7 +19,8 @@ session = CachedSession()
 session.settings.expire_after = NEVER_EXPIRE
 
 
-def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, publisher):
+def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, publisher, is_heightmap,
+                 landscape_size, is_sealevel, flipx, flipy, heightmapblurradius):
     # os.makedirs(os.path.dirname(base_dir), exist_ok=True)
     save_path = base_dir + '/' + sub_dir + '/' + filename
     top_left_lng = bbox[0]
@@ -55,7 +58,7 @@ def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, pu
     # Open the image set using pillow
     msg = {"event": "stitch_tiles", "process": "opening_images"}
     publisher.publish(json.dumps(msg))
-    images = [PIL.Image.open(BytesIO(images_array[x])) for x in images_array]
+    images = [Image.open(BytesIO(images_array[x])) for x in images_array]
 
     # # Calculate the number of image tiles in each direction
     edge_length_x = x_tile_range[1] - x_tile_range[0]
@@ -68,7 +71,7 @@ def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, pu
     total_width = width * edge_length_x
     total_height = height * edge_length_y
     # # Create a new blank image we will fill in
-    composite = PIL.Image.new('RGB', (total_width, total_height))
+    composite = Image.new('RGB', (total_width, total_height))
     # # Loop over the x and y ranges
     y_offset = 0
     count = 0
@@ -77,7 +80,7 @@ def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, pu
         for j in range(0, edge_length_y):
             # Open up the image file and paste it into the composed image at the given offset position
             key = str(i) + '.' + str(j)
-            tmp_img = PIL.Image.open(BytesIO(images_array[key]))
+            tmp_img = Image.open(BytesIO(images_array[key]))
             composite.paste(tmp_img, (y_offset, x_offset))
             msg = {"event": "stitch_tiles", "process": "combining_images", "count": count, "total_count": total_count}
             publisher.publish(json.dumps(msg))
@@ -88,8 +91,59 @@ def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, pu
     msg = {"event": "stitch_tiles", "process": "saving_file"}
     publisher.publish(json.dumps(msg))
     images_array.clear()
-    composite.save(save_path)
-    composite.close()
+
+    if is_heightmap:
+        rgb_elevation = composite.convert('RGB')
+        rgb_data = np.array(rgb_elevation)
+        composite = None
+        r = rgb_data[..., 0].astype(np.float32)
+        g = rgb_data[..., 1].astype(np.float32)
+        b = rgb_data[..., 2].astype(np.float32)
+        decoded_data = -10000 + ((r * 256 * 256 + g * 256 + b) * 0.1)
+        im = np.array(decoded_data)
+        decoded_data = None
+        # im2 = (65535 * (im - im.min()) / im.ptp()).astype(np.uint16)
+        im2 = ((im - im.min()) / (im.max() - im.min()) * 32767).astype(np.uint16)
+        im = None
+        if heightmapblurradius:
+            im2 = gaussian_filter(im2, sigma=int(heightmapblurradius))
+        if flipx:
+            im2 = np.fliplr(im2)
+        if flipy:
+            im2 = np.flipud(im2)
+
+        # composite = Image.fromarray(im2)
+        # composite.save(save_path)
+
+        ds = gdal_array.OpenArray(im2)
+
+        sealevel = '32767'
+        imax = '65535'
+        imin = '0'
+        resize = 'bilinear'
+        if is_sealevel:
+            kwargs = {
+                'scaleParams': [[imin, imax, sealevel, imax]],
+                'format': 'PNG',
+                'outputType': gdal.GDT_UInt16,
+                'width': landscape_size,
+                'height': landscape_size,
+                'resampleAlg': resize,
+            }
+        else:
+            kwargs = {
+                'format': 'PNG',
+                'outputType': gdal.GDT_UInt16,
+                'width': landscape_size,
+                'height': landscape_size,
+                'resampleAlg': resize,
+            }
+
+        gdal.Translate(save_path, ds, **kwargs)
+        ds = None
+    else:
+        composite.save(save_path)
+        composite.close()
 
 # # Testing uncomment
 # bbox = [-122.33875557099599, 46.23192217548484, -121.69074845551023, 45.78185052337425]

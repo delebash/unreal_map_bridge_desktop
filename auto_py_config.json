@@ -7,7 +7,7 @@
   },
   {
    "optionDest": "filenames",
-   "value": "F:/3DProjects/github/DansProjects/map_bridge_backend_flask/run.py"
+   "value": "F:/3DProjects/github/DansProjects/unreal_map_bridge_desktop/run.py"
   },
   {
    "optionDest": "onefile",
@@ -19,7 +19,7 @@
   },
   {
    "optionDest": "name",
-   "value": "Unreal Map Bridge with Server"
+   "value": "Unreal_Map_Bridge_Desktop"
   },
   {
    "optionDest": "ascii",

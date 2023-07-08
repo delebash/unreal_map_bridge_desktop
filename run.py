@@ -39,7 +39,7 @@ def custom_logic(window):
     server.run()
 
 
-window = webview.create_window('Unreal Map Bridge', url='https://map.justgeektechs.com', height=height, width=width)
+window = webview.create_window('Unreal Map Bridge Desktop', url='http://localhost:5173/', height=height, width=width)
 window.events.closed += on_closed
 webview.start(func=custom_logic, args=window, debug=args.debug, private_mode=False)
 

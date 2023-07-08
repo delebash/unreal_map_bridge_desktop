@@ -32,7 +32,15 @@ def process_tiles():  # put application's code here
         api_url = request_data['api_url']
         base_dir = request_data['base_dir']
         sub_dir = request_data['sub_dir']
-        stitch_tiles(bbox, zoom, filename, access_token, api_url, base_dir, sub_dir, publisher)
+        is_heightmap = request_data['is_heightmap']
+        is_sealevel = request_data['sealevel']
+        landscape_size = request_data['landscapeSize']
+        flipx = request_data['flipx']
+        flipy = request_data['flipy']
+        heightmapblurradius = request_data['heightmapblurradius']
+
+        stitch_tiles(bbox, zoom, filename, access_token, api_url, base_dir, sub_dir, publisher, is_heightmap,
+                     landscape_size, is_sealevel, flipx, flipy,heightmapblurradius)
         print('done stitching')
         return {'msg': 'done'}
     else:
