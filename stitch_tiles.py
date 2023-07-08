@@ -17,11 +17,13 @@ from scipy.ndimage.filters import gaussian_filter
 # GDAL_LIBRARY_PATH = os.path.join(BASE_DIR, r'venv\lib\site-packages\osgeo\gdal300.dll')
 session = CachedSession()
 session.settings.expire_after = NEVER_EXPIRE
+# global_publisher = None
 
 
 def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, publisher, is_heightmap,
                  landscape_size, is_sealevel, flipx, flipy, heightmapblurradius):
     # os.makedirs(os.path.dirname(base_dir), exist_ok=True)
+    # global_publisher = publisher
     save_path = base_dir + '/' + sub_dir + '/' + filename
     top_left_lng = bbox[0]
     top_left_lat = bbox[1]
@@ -87,9 +89,6 @@ def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, pu
             x_offset += width  # Update the width
             count = count + 1
         y_offset += height  # Update the height
-    # # Save the final image
-    msg = {"event": "stitch_tiles", "process": "saving_file"}
-    publisher.publish(json.dumps(msg))
     images_array.clear()
 
     if is_heightmap:
@@ -139,11 +138,23 @@ def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, pu
                 'resampleAlg': resize,
             }
 
-        gdal.Translate(save_path, ds, **kwargs)
+        gdal.Translate(save_path, ds, **kwargs, callback=progress_cb, callback_data=publisher)
         ds = None
     else:
+        # # Save the final image
+        msg = {"event": "stitch_tiles", "process": "saving_file"}
+        publisher.publish(json.dumps(msg))
         composite.save(save_path)
         composite.close()
+
+
+def progress_cb(complete, message, cb_data):
+    msg = {"event": "stitch_tiles", "process": "gdal_resampling", "count": int(complete * 100), "total_count": ''}
+    cb_data.publish(json.dumps(msg))
+    # if int(complete * 100) % 10 == 0:
+    #     print(f'{complete * 100:.0f}', end='', flush=True)
+    # elif int(complete * 100) % 3 == 0:
+    #     print(f'{cb_data}', end='', flush=True)
 
 # # Testing uncomment
 # bbox = [-122.33875557099599, 46.23192217548484, -121.69074845551023, 45.78185052337425]
