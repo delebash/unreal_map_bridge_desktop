@@ -17,6 +17,8 @@ from scipy.ndimage.filters import gaussian_filter
 # GDAL_LIBRARY_PATH = os.path.join(BASE_DIR, r'venv\lib\site-packages\osgeo\gdal300.dll')
 session = CachedSession()
 session.settings.expire_after = NEVER_EXPIRE
+
+
 # global_publisher = None
 
 
@@ -120,28 +122,20 @@ def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, pu
         imax = '65535'
         imin = '0'
         resize = 'bilinear'
+
+        kwargs = {'format': 'PNG', 'outputType': gdal.GDT_UInt16}
         if is_sealevel:
-            kwargs = {
-                'scaleParams': [[imin, imax, sealevel, imax]],
-                'format': 'PNG',
-                'outputType': gdal.GDT_UInt16,
-                'width': landscape_size,
-                'height': landscape_size,
-                'resampleAlg': resize,
-            }
-        else:
-            kwargs = {
-                'format': 'PNG',
-                'outputType': gdal.GDT_UInt16,
-                'width': landscape_size,
-                'height': landscape_size,
-                'resampleAlg': resize,
-            }
+            kwargs['scaleParams'] = [[imin, imax, sealevel, imax]]
+
+        if int(landscape_size) > 0:
+            kwargs['width'] = landscape_size
+            kwargs['height'] = landscape_size
+            kwargs['resampleAlg'] = resize
 
         gdal.Translate(save_path, ds, **kwargs, callback=progress_cb, callback_data=publisher)
         ds = None
     else:
-        # # Save the final image
+        # Save the final image
         msg = {"event": "stitch_tiles", "process": "saving_file"}
         publisher.publish(json.dumps(msg))
         composite.save(save_path)
@@ -149,7 +143,7 @@ def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, pu
 
 
 def progress_cb(complete, message, cb_data):
-    msg = {"event": "stitch_tiles", "process": "gdal_resampling", "count": int(complete * 100), "total_count": ''}
+    msg = {"event": "stitch_tiles", "process": "gdal_resampling", "count": int(complete * 100), "total_count": 100}
     cb_data.publish(json.dumps(msg))
     # if int(complete * 100) % 10 == 0:
     #     print(f'{complete * 100:.0f}', end='', flush=True)
