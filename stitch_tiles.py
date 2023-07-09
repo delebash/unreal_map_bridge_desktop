@@ -19,9 +19,6 @@ session = CachedSession()
 session.settings.expire_after = NEVER_EXPIRE
 
 
-# global_publisher = None
-
-
 def stitch_tiles(bbox, z, filename, access_token, api_url, base_dir, sub_dir, publisher, is_heightmap,
                  landscape_size, is_sealevel, flipx, flipy, heightmapblurradius):
     # os.makedirs(os.path.dirname(base_dir), exist_ok=True)
